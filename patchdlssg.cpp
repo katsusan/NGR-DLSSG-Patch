@@ -1,6 +1,6 @@
 // compile option: 
-//  cl /LD /DDEBUG patchDLSSG.cpp /link /DEF:winmm.def winmm.lib /OUT:winmm.dll [debug]
-//  cl /LD patchDLSSG.cpp /link /DEF:winmm.def winmm.lib /OUT:winmm.dll [release]
+//  cl /LD /DDEBUG patchDLSSG.cpp /link /DEF:winmm.def winmm.lib /OUT:patchdlssg.dll [debug]
+//  cl /LD patchDLSSG.cpp /link /DEF:winmm.def winmm.lib /OUT:patchdlssg.dll [release]
 
 #include <windows.h>
 #include <Psapi.h>
