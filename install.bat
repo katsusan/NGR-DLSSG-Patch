@@ -7,6 +7,8 @@ copy /Y "%SystemRoot%\System32\winmm.dll" "oswinmm.dll"
 echo Rename patch DLL
 ren "patchdlssg.dll" "winmm.dll"
 
+attrib -R "%LOCALAPPDATA%\NGR\Saved\Config\WindowsNoEditor\Engine.ini"
+
 > "%LOCALAPPDATA%\NGR\Saved\Config\WindowsNoEditor\Engine.ini" (
   echo [Core.System]
   echo Paths=../../../Engine/Content
