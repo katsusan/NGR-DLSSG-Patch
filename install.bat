@@ -228,5 +228,7 @@ ren "patchdlssg.dll" "winmm.dll"
   echo t.Streamline.Reflex.HandleMaxTickRate=1
 )
 
+attrib +R "%LOCALAPPDATA%\NGR\Saved\Config\WindowsNoEditor\Engine.ini"
+
 echo Done.
 pause
