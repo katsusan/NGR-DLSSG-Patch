@@ -28,7 +28,9 @@ void Log(const char* fmt, ...)
 
     fprintf(
         f,
-        "[%02d:%02d:%02d.%03d] ",
+        "[%d/%d - %02d:%02d:%02d.%03d] ",
+        st.wMonth,
+        st.wDay,
         st.wHour,
         st.wMinute,
         st.wSecond,
@@ -252,6 +254,37 @@ HMODULE FindsldlssgModule() {
 
 
 
+static const uint8_t patternBytes[] =
+{
+    0x40, 0x53,
+    0x48, 0x83, 0xEC, 0x30,
+    0x48, 0x8B, 0x1D, 0xCC, 0xCC, 0xCC, 0xCC,
+    0x33, 0xC9,
+    0xE8, 0xCC, 0xCC, 0xCC, 0xCC,
+    0x8B, 0xC0,
+    0x8B, 0x14, 0x83,
+    0x8B, 0xCA,
+};
+
+static const uint8_t patched[] =
+{
+    0xB8, 0x01, 0x00, 0x00, 0x00,
+    0xC3,
+};
+
+bool sigmatch(uint8_t* addr, const uint8_t* pattern, size_t len) {
+    for (size_t i = 0; i < len; ++i) {
+        if (pattern[i] == 0xCC) {
+            continue;
+        }
+
+        if (addr[i] != pattern[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
 // patch SLDLSSGModeFromCvar
 bool patchDLSSG() {
     Log("[patchDLSSG] start");
@@ -275,22 +308,11 @@ bool patchDLSSG() {
     size_t msize = static_cast<size_t>(minfo.SizeOfImage);
     Log("[patchDLSSG] module base: %p, module size: %zu", base, msize);
 
-    // 1.take all matched addresses,two results expected
-    static const uint8_t pattern[] =
-    {
-        0x48, 0x83, 0xEC, 0x38,
-        0x33, 0xD2,
-        0x48, 0x8D, 0x0D
-    };
-    static const uint8_t patched[] =
-    {
-        0xB8, 0x01, 0x00, 0x00, 0x00,
-        0xC3,
-    };
-
+    // 1.take all matched addresses,two places expected
+    
     std::vector<uint8_t*> matched;
-    for (size_t i = 0; i < msize - sizeof(pattern); ++i) {
-        if (memcmp(base+i, pattern, sizeof(pattern)) == 0) {
+    for (size_t i = 0; i < msize - sizeof(patternBytes); ++i) {
+        if (sigmatch(base + i, patternBytes, sizeof(patternBytes))) {
             matched.push_back(base + i);
         }
     }
@@ -300,8 +322,12 @@ bool patchDLSSG() {
         Log("[patchDLSSG] matched address: %p", addr);
     }
 
+    if (matched.size() != 1) {
+        Log("[patchDLSSG] couldn't find matching pattern or find multiple matching results, matched.size=%zu", matched.size());
+        return false;
+    }
+
     // first function is expected to be SLDLSSGModeFromCvar
-    bool done = false;
     uint8_t* addr = matched[0];
     DWORD oldProtect{};
     if (VirtualProtect(addr, sizeof(patched), PAGE_EXECUTE_READWRITE, &oldProtect)) {
@@ -309,15 +335,13 @@ bool patchDLSSG() {
         //FlushInstructionCache(GetCurrentProcess(), addr, sizeof(patched));
         VirtualProtect(addr, sizeof(patched), oldProtect, &oldProtect);
         Log("[patchDLSSG] patched addr:%p", addr);
-        done = true;
     }
     else {
         Log("[patchDLSSG] VirtualProtect failed at %p", addr);
-        done = false;
     }
 
     Log("[patchDLSSG] end");
-    return done;
+    return true;
 }
 
 DWORD WINAPI ThreadProc(LPVOID)
