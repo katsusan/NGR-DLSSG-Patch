@@ -12,7 +12,7 @@ attrib -R "%LOCALAPPDATA%\NGR\Saved\Config\WindowsNoEditor\Engine.ini"
 > "%LOCALAPPDATA%\NGR\Saved\Config\WindowsNoEditor\Engine.ini" (
   echo [Core.System]
   echo Paths=../../../Engine/Content
-  echo Paths=%GAMEDIR%Content
+  echo Paths=%%GAMEDIR%%Content
   echo Paths=../../../NGR/Plugins/Runtime/GPCore/Content
   echo Paths=../../../Engine/Plugins/Experimental/ControlRig/Content
   echo Paths=../../../NGR/Plugins/Runtime/NGRAdaptiveEffect/Content
@@ -218,7 +218,7 @@ attrib -R "%LOCALAPPDATA%\NGR\Saved\Config\WindowsNoEditor\Engine.ini"
   echo Paths=../../../Engine/Plugins/Compositing/OpenColorIO/Content
   echo Paths=../../../Engine/Plugins/Runtime/Synthesis/Content
   echo Paths=../../../Engine/Plugins/Runtime/AudioSynesthesia/Content
-  echo .
+  echo(
   echo [ConsoleVariables]
   echo r.Streamline.InitializePlugin=1
   echo r.Streamline.Load.Reflex=1
@@ -231,6 +231,5 @@ attrib -R "%LOCALAPPDATA%\NGR\Saved\Config\WindowsNoEditor\Engine.ini"
 )
 
 attrib +R "%LOCALAPPDATA%\NGR\Saved\Config\WindowsNoEditor\Engine.ini"
-
 echo Done.
 pause
